@@ -1,0 +1,36 @@
+{
+  "name": "axon-backend",
+  "version": "1.0.0",
+  "description": "Axon — Smart Project Management Platform Backend",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "NODE_ENV=development node --watch src/server.js",
+    "start": "NODE_ENV=production node src/server.js",
+    "db:generate": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "db:migrate": "npx prisma migrate dev",
+    "db:migrate:prod": "npx prisma migrate deploy",
+    "db:seed": "node prisma/seed.js",
+    "db:studio": "npx prisma studio"
+  },
+  "keywords": ["project-management", "workflow", "rbac", "clean-architecture"],
+  "author": "Nitin Sahu",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.0.1",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "prisma": "^6.5.0"
+  }
+}
