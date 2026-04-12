@@ -10,6 +10,9 @@ import errorHandler from "./middleware/errorHandler.js";
 import { rateLimiter } from "./middleware/rateLimiter.js";
 import ApiError from "./utils/ApiError.js";
 
+// Initialize Side-Effect Observers
+import "./services/notification.service.js";
+
 /**
  * Express application factory.
  * Configures middleware stack and mounts routes.

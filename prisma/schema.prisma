@@ -101,6 +101,7 @@ model Project {
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   creator   User      @relation("ProjectCreator", fields: [createdBy], references: [id])
   tasks     Task[]
+  sprints   Sprint[]
   workflow  Workflow?
 
   @@map("projects")
@@ -111,8 +112,10 @@ model Task {
   title         String
   description   String?
   projectId     String       @map("project_id")
+  sprintId      String?      @map("sprint_id")
   assigneeId    String?      @map("assignee_id")
   parentTaskId  String?      @map("parent_task_id")
+  storyPoints   Int          @default(0) @map("story_points")
   createdBy     String       @map("created_by")
   currentStatus String       @default("TODO") @map("current_status")
   priority      TaskPriority @default(MEDIUM)
@@ -122,6 +125,7 @@ model Task {
 
   // Relations
   project      Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sprint       Sprint?          @relation(fields: [sprintId], references: [id])
   assignee     User?            @relation("TaskAssignee", fields: [assigneeId], references: [id])
   parentTask   Task?            @relation("SubTasks", fields: [parentTaskId], references: [id], onDelete: Cascade)
   subTasks     Task[]           @relation("SubTasks")
@@ -131,38 +135,78 @@ model Task {
   dependents   TaskDependency[] @relation("DependsOnTask")
 
   @@index([projectId])
+  @@index([sprintId])
   @@index([assigneeId])
   @@index([parentTaskId])
   @@index([currentStatus])
   @@map("tasks")
 }
 
+model Sprint {
+  id          String   @id @default(uuid())
+  projectId   String   @map("project_id")
+  name        String
+  goal        String?
+  startDate   DateTime @map("start_date")
+  endDate     DateTime @map("end_date")
+  status      String   @default("PLANNED") // PLANNED, ACTIVE, COMPLETED
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks       Task[]
+
+  @@index([projectId])
+  @@map("sprints")
+}
+
 model Workflow {
   id        String   @id @default(uuid())
   projectId String   @unique @map("project_id")
-  statuses  String[] @default(["TODO", "IN_PROGRESS", "DONE"])
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  transitions Transition[]
+  project     Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  states      WorkflowState[]
+  transitions WorkflowTransition[]
 
   @@map("workflows")
 }
 
-model Transition {
-  id               String  @id @default(uuid())
-  workflowId       String  @map("workflow_id")
-  fromStatus       String  @map("from_status")
-  toStatus         String  @map("to_status")
-  requiresApproval Boolean @default(false) @map("requires_approval")
+model WorkflowState {
+  id          String   @id @default(uuid())
+  workflowId  String   @map("workflow_id")
+  name        String
+  description String?
+  isInitial   Boolean  @default(false) @map("is_initial")
+  isFinal     Boolean  @default(false) @map("is_final")
+  createdAt   DateTime @default(now()) @map("created_at")
 
   // Relations
-  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  workflow            Workflow             @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  outgoingTransitions WorkflowTransition[] @relation("FromState")
+  incomingTransitions WorkflowTransition[] @relation("ToState")
 
-  @@unique([workflowId, fromStatus, toStatus])
-  @@map("transitions")
+  @@unique([workflowId, name])
+  @@map("workflow_states")
+}
+
+model WorkflowTransition {
+  id           String          @id @default(uuid())
+  workflowId   String          @map("workflow_id")
+  fromStateId  String          @map("from_state_id")
+  toStateId    String          @map("to_state_id")
+  allowedRoles WorkspaceRole[] @default([]) @map("allowed_roles")
+
+  // Relations
+  workflow  Workflow      @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  fromState WorkflowState @relation("FromState", fields: [fromStateId], references: [id], onDelete: Cascade)
+  toState   WorkflowState @relation("ToState", fields: [toStateId], references: [id], onDelete: Cascade)
+
+  @@unique([workflowId, fromStateId, toStateId])
+  @@map("workflow_transitions")
 }
 
 model Approval {
