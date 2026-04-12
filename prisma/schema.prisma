@@ -53,6 +53,7 @@ model User {
   approvalRequests  Approval[]        @relation("ApprovalRequester")
   approvalDecisions Approval[]        @relation("ApprovalDecider")
   auditLogs         AuditLog[]
+  comments          Comment[]         @relation("UserComments")
 
   @@map("users")
 }
@@ -133,6 +134,7 @@ model Task {
   approvals    Approval[]
   dependencies TaskDependency[] @relation("DependentTask")
   dependents   TaskDependency[] @relation("DependsOnTask")
+  comments     Comment[]        @relation("TaskComments")
 
   @@index([projectId])
   @@index([sprintId])
@@ -140,6 +142,25 @@ model Task {
   @@index([parentTaskId])
   @@index([currentStatus])
   @@map("tasks")
+}
+
+model Comment {
+  id              String   @id @default(uuid())
+  content         String
+  taskId          String   @map("task_id")
+  userId          String   @map("user_id")
+  parentCommentId String?  @map("parent_comment_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  task          Task      @relation("TaskComments", fields: [taskId], references: [id], onDelete: Cascade)
+  user          User      @relation("UserComments", fields: [userId], references: [id], onDelete: Cascade)
+  parentComment Comment?  @relation("ThreadedReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies       Comment[] @relation("ThreadedReplies")
+
+  @@index([taskId])
+  @@index([parentCommentId])
+  @@map("comments")
 }
 
 model Sprint {
