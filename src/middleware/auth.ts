@@ -1,29 +1,31 @@
+import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import config from "../config/index.js";
-import ApiError from "../utils/ApiError.js";
-import { prisma } from "../config/database.js";
+import config from "../config/index";
+import ApiError from "../utils/ApiError";
+import { prisma } from "../config/database";
+
+interface JwtPayload {
+  userId: string;
+}
 
 /**
  * JWT authentication middleware.
  * Extracts token from Authorization header or cookies,
  * verifies it, and attaches user to req.user.
  */
-const authenticate = async (req, _res, next) => {
+const authenticate = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
   try {
-    // Extract token from header or cookie
     const authHeader = req.headers.authorization;
     const token =
       (authHeader && authHeader.startsWith("Bearer ") && authHeader.split(" ")[1]) ||
-      req.cookies?.accessToken;
+      (req as any).cookies?.accessToken;
 
     if (!token) {
       throw ApiError.unauthorized("Access token is required");
     }
 
-    // Verify token
-    const decoded = jwt.verify(token, config.jwt.secret);
+    const decoded = jwt.verify(token, config.jwt.secret) as JwtPayload;
 
-    // Fetch user from DB (ensures user still exists & isn't deleted)
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       select: {
@@ -38,9 +40,9 @@ const authenticate = async (req, _res, next) => {
       throw ApiError.unauthorized("User no longer exists");
     }
 
-    req.user = user;
+    (req as any).user = user;
     next();
-  } catch (error) {
+  } catch (error: any) {
     next(error instanceof ApiError ? error : ApiError.unauthorized(error.message));
   }
 };
@@ -48,12 +50,9 @@ const authenticate = async (req, _res, next) => {
 /**
  * Role-based authorization middleware factory.
  * Must be used AFTER authenticate middleware.
- *
- * @param  {...string} allowedRoles - Roles permitted to access the route
- * @returns {Function} Express middleware
  */
-const authorize = (...allowedRoles) => {
-  return async (req, _res, next) => {
+const authorize = (...allowedRoles: string[]) => {
+  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
       const { workspaceId } = req.params;
 
@@ -65,7 +64,7 @@ const authorize = (...allowedRoles) => {
         where: {
           workspaceId_userId: {
             workspaceId,
-            userId: req.user.id,
+            userId: (req as any).user.id,
           },
         },
       });
@@ -80,10 +79,9 @@ const authorize = (...allowedRoles) => {
         );
       }
 
-      // Attach membership info to request for downstream use
-      req.membership = membership;
+      (req as any).membership = membership;
       next();
-    } catch (error) {
+    } catch (error: any) {
       next(error instanceof ApiError ? error : ApiError.internal(error.message));
     }
   };

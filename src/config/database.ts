@@ -1,17 +1,15 @@
 import { PrismaClient } from "@prisma/client";
 
+/**
+ * Database Singleton — ensures a single PrismaClient instance across the application.
+ * Implements the Singleton Design Pattern with strict encapsulation.
+ */
 class Database {
-  /** @type {Database} */
-  static #instance = null;
+  private static instance: Database;
+  private client: PrismaClient;
 
-  /** @type {PrismaClient} */
-  #client = null;
-
-  constructor() {
-    if (Database.#instance) {
-      throw new Error("Use Database.getInstance() — singleton pattern.");
-    }
-    this.#client = new PrismaClient({
+  private constructor() {
+    this.client = new PrismaClient({
       log:
         process.env.NODE_ENV === "development"
           ? ["query", "info", "warn", "error"]
@@ -19,36 +17,33 @@ class Database {
     });
   }
 
-  /** @returns {Database} */
-  static getInstance() {
-    if (!Database.#instance) {
-      Database.#instance = new Database();
+  public static getInstance(): Database {
+    if (!Database.instance) {
+      Database.instance = new Database();
     }
-    return Database.#instance;
+    return Database.instance;
   }
 
-  /** @returns {PrismaClient} */
-  getClient() {
-    return this.#client;
+  public getClient(): PrismaClient {
+    return this.client;
   }
 
-  async connect() {
+  public async connect(): Promise<void> {
     try {
-      await this.#client.$connect();
+      await this.client.$connect();
       console.log("✅  Database connected successfully");
-    } catch (error) {
+    } catch (error: any) {
       console.error("❌  Database connection failed:", error.message);
       process.exit(1);
     }
   }
 
-  async disconnect() {
-    await this.#client.$disconnect();
+  public async disconnect(): Promise<void> {
+    await this.client.$disconnect();
     console.log("🔌  Database disconnected");
   }
 }
 
-// Export singleton client for convenience
 const db = Database.getInstance();
-export const prisma = db.getClient();
+export const prisma: PrismaClient = db.getClient();
 export default db;

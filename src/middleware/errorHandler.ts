@@ -1,16 +1,16 @@
-import ApiError from "../utils/ApiError.js";
-import logger from "../utils/logger.js";
-import config from "../config/index.js";
+import { Request, Response, NextFunction } from "express";
+import ApiError from "../utils/ApiError";
+import logger from "../utils/logger";
+import config from "../config/index";
 
 /**
  * Global error handling middleware.
  * Catches all errors thrown/passed via next() and returns a consistent JSON response.
  */
-const errorHandler = (err, req, res, _next) => {
-  // Default to 500 if no status code is set
-  let statusCode = err.statusCode || 500;
-  let message = err.message || "Internal server error";
-  let errors = err.errors || [];
+const errorHandler = (err: any, req: Request, res: Response, _next: NextFunction): Response => {
+  let statusCode: number = err.statusCode || 500;
+  let message: string = err.message || "Internal server error";
+  let errors: Array<{ field: string; message: string }> = err.errors || [];
 
   // ─── Prisma Known Errors ──────────────────────
   if (err.code === "P2002") {
@@ -28,7 +28,7 @@ const errorHandler = (err, req, res, _next) => {
   if (err.name === "ZodError") {
     statusCode = 422;
     message = "Validation failed";
-    errors = err.issues.map((issue) => ({
+    errors = err.issues.map((issue: any) => ({
       field: issue.path.join("."),
       message: issue.message,
     }));
@@ -56,7 +56,7 @@ const errorHandler = (err, req, res, _next) => {
   }
 
   // ─── Send response ───────────────────────────
-  const response = {
+  const response: Record<string, any> = {
     success: false,
     statusCode,
     message,

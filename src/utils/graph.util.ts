@@ -1,3 +1,27 @@
+interface TaskNode {
+  id: string;
+}
+
+interface Dependency {
+  taskId: string;
+  dependsOnId: string;
+}
+
+interface AdjacencyResult {
+  adj: Record<string, string[]>;
+  inDegree: Record<string, number>;
+}
+
+interface CriticalPathResult {
+  length: number;
+  path: string[];
+}
+
+interface BottleneckResult {
+  taskId: string;
+  dependentCount: number;
+}
+
 /**
  * Graph utility class for Task Dependency operations.
  */
@@ -5,27 +29,20 @@ class GraphUtil {
   /**
    * Build adjacency list from dependencies.
    * Directed edge: A -> B means A MUST FINISH BEFORE B CAN START.
-   * So if A depends on B, the edge in our graph is B -> A.
-   * 
-   * @param {Array} tasks - list of task objects {id}
-   * @param {Array} dependencies - list of {taskId, dependsOnId}
-   * @returns {Object} adjacency list { nodeId: [childNodeId, ...] }
    */
-  static buildAdjacencyList(tasks, dependencies) {
-    const adj = {};
-    const inDegree = {};
-    
-    tasks.forEach(t => {
+  static buildAdjacencyList(tasks: TaskNode[], dependencies: Dependency[]): AdjacencyResult {
+    const adj: Record<string, string[]> = {};
+    const inDegree: Record<string, number> = {};
+
+    tasks.forEach((t) => {
       adj[t.id] = [];
       inDegree[t.id] = 0;
     });
 
-    dependencies.forEach(dep => {
-      // dep.taskId depends on dep.dependsOnId
-      // Meaning dependsOnId -> taskId
+    dependencies.forEach((dep) => {
       const u = dep.dependsOnId;
       const v = dep.taskId;
-      
+
       if (adj[u]) {
         adj[u].push(v);
       }
@@ -40,11 +57,11 @@ class GraphUtil {
   /**
    * Detect cycle in a directed graph using DFS.
    */
-  static detectCycle(adj) {
-    const visited = new Set();
-    const recStack = new Set();
+  static detectCycle(adj: Record<string, string[]>): boolean {
+    const visited = new Set<string>();
+    const recStack = new Set<string>();
 
-    const dfs = (node) => {
+    const dfs = (node: string): boolean => {
       if (recStack.has(node)) return true;
       if (visited.has(node)) return false;
 
@@ -63,27 +80,26 @@ class GraphUtil {
 
     for (const node of Object.keys(adj)) {
       if (!visited.has(node)) {
-        if (dfs(node)) return true; // Cycle detected
+        if (dfs(node)) return true;
       }
     }
 
-    return false; // No cycle
+    return false;
   }
 
   /**
    * Implement Topological Sort using Kahn's algorithm.
    */
-  static topologicalSort(adj, inDegree) {
-    const queue = [];
-    const sorted = [];
+  static topologicalSort(adj: Record<string, string[]>, inDegree: Record<string, number>): string[] {
+    const queue: string[] = [];
+    const sorted: string[] = [];
 
-    // Initialize queue with all nodes having in-degree 0
     for (const node of Object.keys(inDegree)) {
       if (inDegree[node] === 0) queue.push(node);
     }
 
     while (queue.length > 0) {
-      const u = queue.shift();
+      const u = queue.shift()!;
       sorted.push(u);
 
       if (adj[u]) {
@@ -94,7 +110,6 @@ class GraphUtil {
       }
     }
 
-    // If sorted contains all nodes, we have a valid top sort
     if (sorted.length !== Object.keys(adj).length) {
       throw new Error("Graph has a cycle! Topological sort is not possible.");
     }
@@ -103,23 +118,21 @@ class GraphUtil {
   }
 
   /**
-   * Compute Critical Path relying on uniform task weights (duration = 1).
-   * Could be expanded to map true task durations.
+   * Compute Critical Path using longest-path analysis.
    */
-  static computeCriticalPath(adj, sortedNodes) {
-    // longest path (cost) to arrive at node u
-    const dist = {};
-    const parent = {};
+  static computeCriticalPath(adj: Record<string, string[]>, sortedNodes: string[]): CriticalPathResult {
+    const dist: Record<string, number> = {};
+    const parent: Record<string, string | null> = {};
 
-    sortedNodes.forEach(node => {
-      dist[node] = 1; // Base cost for each task
+    sortedNodes.forEach((node) => {
+      dist[node] = 1;
       parent[node] = null;
     });
 
     for (const u of sortedNodes) {
       if (adj[u]) {
         for (const v of adj[u]) {
-          if (dist[v] < dist[u] + 1) { // 1 is weight of task v
+          if (dist[v] < dist[u] + 1) {
             dist[v] = dist[u] + 1;
             parent[v] = u;
           }
@@ -127,9 +140,8 @@ class GraphUtil {
       }
     }
 
-    // Find the node with the maximum distance
     let maxDist = 0;
-    let endNode = null;
+    let endNode: string | null = null;
     for (const node of sortedNodes) {
       if (dist[node] > maxDist) {
         maxDist = dist[node];
@@ -137,9 +149,8 @@ class GraphUtil {
       }
     }
 
-    // Backtrack to build the path
-    const criticalPath = [];
-    let curr = endNode;
+    const criticalPath: string[] = [];
+    let curr: string | null = endNode;
     while (curr) {
       criticalPath.unshift(curr);
       curr = parent[curr];
@@ -149,21 +160,18 @@ class GraphUtil {
   }
 
   /**
-   * Return bottleneck tasks.
-   * Bottleneck: Tasks with the highest out-degree (most dependents).
+   * Return bottleneck tasks — highest out-degree (most dependents).
    */
-  static computeBottlenecks(adj) {
-    const outDegree = {};
-    Object.keys(adj).forEach(node => {
+  static computeBottlenecks(adj: Record<string, string[]>): BottleneckResult[] {
+    const outDegree: Record<string, number> = {};
+    Object.keys(adj).forEach((node) => {
       outDegree[node] = adj[node].length;
     });
 
-    // Sort nodes descending by out-degree
     const sortedByOutDegree = Object.entries(outDegree)
       .sort((a, b) => b[1] - a[1])
       .map(([node, degree]) => ({ taskId: node, dependentCount: degree }));
 
-    // Return the top 3 heavily depended-upon tasks
     return sortedByOutDegree.slice(0, 3);
   }
 }

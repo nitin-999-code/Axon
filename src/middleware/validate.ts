@@ -1,15 +1,20 @@
-import ApiError from "../utils/ApiError.js";
+import { Request, Response, NextFunction } from "express";
+import { ZodSchema } from "zod";
+import ApiError from "../utils/ApiError";
+
+interface ValidationSchemas {
+  body?: ZodSchema;
+  query?: ZodSchema;
+  params?: ZodSchema;
+}
 
 /**
  * Request validation middleware factory using Zod schemas.
  * Validates body, query, and/or params against provided schemas.
- *
- * @param {Object} schemas - Object with optional body, query, params Zod schemas
- * @returns {Function} Express middleware
  */
-const validate = (schemas) => {
-  return (req, _res, next) => {
-    const errors = [];
+const validate = (schemas: ValidationSchemas) => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    const errors: Array<{ field: string; message: string }> = [];
 
     if (schemas.body) {
       const result = schemas.body.safeParse(req.body);
@@ -21,7 +26,7 @@ const validate = (schemas) => {
           }))
         );
       } else {
-        req.body = result.data; // Use parsed/transformed data
+        req.body = result.data;
       }
     }
 
@@ -35,7 +40,7 @@ const validate = (schemas) => {
           }))
         );
       } else {
-        req.query = result.data;
+        (req as any).query = result.data;
       }
     }
 
@@ -49,7 +54,7 @@ const validate = (schemas) => {
           }))
         );
       } else {
-        req.params = result.data;
+        (req as any).params = result.data;
       }
     }
 

@@ -7,22 +7,22 @@ export const ROLES = Object.freeze({
   OWNER: "OWNER",
   ADMIN: "ADMIN",
   MEMBER: "MEMBER",
-});
+} as const);
 
 export const TASK_PRIORITIES = Object.freeze({
   LOW: "LOW",
   MEDIUM: "MEDIUM",
   HIGH: "HIGH",
   URGENT: "URGENT",
-});
+} as const);
 
 export const APPROVAL_STATUSES = Object.freeze({
   PENDING: "PENDING",
   APPROVED: "APPROVED",
   REJECTED: "REJECTED",
-});
+} as const);
 
-export const DEFAULT_WORKFLOW_STATUSES = Object.freeze([
+export const DEFAULT_WORKFLOW_STATUSES: readonly string[] = Object.freeze([
   "TODO",
   "IN_PROGRESS",
   "IN_REVIEW",
@@ -61,7 +61,7 @@ export const AUDIT_ACTIONS = Object.freeze({
   // Dependency
   DEPENDENCY_ADDED: "DEPENDENCY_ADDED",
   DEPENDENCY_REMOVED: "DEPENDENCY_REMOVED",
-});
+} as const);
 
 export const ENTITY_TYPES = Object.freeze({
   USER: "USER",
@@ -70,4 +70,4 @@ export const ENTITY_TYPES = Object.freeze({
   TASK: "TASK",
   WORKFLOW: "WORKFLOW",
   APPROVAL: "APPROVAL",
-});
+} as const);

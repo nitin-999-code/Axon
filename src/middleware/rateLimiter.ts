@@ -1,5 +1,5 @@
 import rateLimit from "express-rate-limit";
-import config from "../config/index.js";
+import config from "../config/index";
 
 /**
  * Global rate limiter — prevents abuse and brute-force attacks.
@@ -20,7 +20,7 @@ const rateLimiter = rateLimit({
  * Stricter rate limiter for auth endpoints (login, register).
  */
 const authRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000,
   max: 20,
   standardHeaders: true,
   legacyHeaders: false,
