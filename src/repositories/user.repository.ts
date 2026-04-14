@@ -1,20 +1,21 @@
-import BaseRepository from "./base.repository.js";
+import BaseRepository from "./base.repository";
 
 /**
  * User Repository — data access for User entity.
+ * Extends BaseRepository (Inheritance).
  */
 class UserRepository extends BaseRepository {
   constructor() {
     super("user");
   }
 
-  async findByEmail(email) {
+  public async findByEmail(email: string): Promise<any> {
     return this.model.findUnique({
       where: { email },
     });
   }
 
-  async existsByEmail(email) {
+  public async existsByEmail(email: string): Promise<boolean> {
     const count = await this.model.count({
       where: { email },
     });
