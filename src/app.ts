@@ -1,23 +1,25 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import swaggerUi from "swagger-ui-express";
 
-import config from "./config/index.js";
-import routes from "./routes/index.js";
-import errorHandler from "./middleware/errorHandler.js";
-import { rateLimiter } from "./middleware/rateLimiter.js";
-import ApiError from "./utils/ApiError.js";
+import config from "./config/index";
+import routes from "./routes/index";
+import errorHandler from "./middleware/errorHandler";
+import { rateLimiter } from "./middleware/rateLimiter";
+import ApiError from "./utils/ApiError";
+import swaggerSpec from "./config/swagger";
 
-// Initialize Side-Effect Observers
-import "./services/notification.service.js";
+// Initialize Side-Effect Observers (Observer Pattern)
+import "./services/notification.service";
 
 /**
  * Express application factory.
  * Configures middleware stack and mounts routes.
  */
-const createApp = () => {
+const createApp = (): express.Application => {
   const app = express();
 
   // ─── Security ─────────────────────────────────
@@ -44,21 +46,25 @@ const createApp = () => {
     app.use(morgan("combined"));
   }
 
+  // ─── Swagger API Docs ─────────────────────────
+  app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
   // ─── API Routes ───────────────────────────────
   app.use("/api", routes);
 
   // ─── Root ─────────────────────────────────────
-  app.get("/", (_req, res) => {
+  app.get("/", (_req: Request, res: Response) => {
     res.json({
       name: "Axon API",
       version: "1.0.0",
       description: "Smart Project Management Platform",
-      docs: "/api/health",
+      docs: "/api/docs",
+      health: "/api/health",
     });
   });
 
   // ─── 404 Handler ──────────────────────────────
-  app.use((_req, _res, next) => {
+  app.use((_req: Request, _res: Response, next: NextFunction) => {
     next(ApiError.notFound("Route not found"));
   });
 

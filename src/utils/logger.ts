@@ -1,49 +1,46 @@
+import winston from "winston";
 import config from "../config/index";
 
+const { combine, timestamp, printf, colorize, errors } = winston.format;
+
 /**
- * Lightweight structured logger.
- * In production, replace with Winston/Pino for file & transport support.
+ * Production-grade structured logger using Winston.
+ * Replaces all console.log calls with leveled, structured output.
  */
-enum LogLevel {
-  DEBUG = 0,
-  INFO = 1,
-  WARN = 2,
-  ERROR = 3,
-}
+const devFormat = combine(
+  colorize(),
+  timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+  errors({ stack: true }),
+  printf(({ level, message, timestamp, stack, ...meta }) => {
+    const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : "";
+    return `[${timestamp}] ${level}: ${message}${metaStr}${stack ? `\n${stack}` : ""}`;
+  })
+);
 
-const currentLevel: LogLevel =
-  config.env === "production" ? LogLevel.INFO : LogLevel.DEBUG;
+const prodFormat = combine(
+  timestamp(),
+  errors({ stack: true }),
+  winston.format.json()
+);
 
-function formatMessage(level: string, message: string, meta: Record<string, any> = {}): string {
-  const timestamp = new Date().toISOString();
-  const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : "";
-  return `[${timestamp}] [${level}] ${message}${metaStr}`;
-}
-
-const logger = {
-  debug(message: string, meta: Record<string, any> = {}): void {
-    if (currentLevel <= LogLevel.DEBUG) {
-      console.debug(formatMessage("DEBUG", message, meta));
-    }
-  },
-
-  info(message: string, meta: Record<string, any> = {}): void {
-    if (currentLevel <= LogLevel.INFO) {
-      console.info(formatMessage("INFO", message, meta));
-    }
-  },
-
-  warn(message: string, meta: Record<string, any> = {}): void {
-    if (currentLevel <= LogLevel.WARN) {
-      console.warn(formatMessage("WARN", message, meta));
-    }
-  },
-
-  error(message: string, meta: Record<string, any> = {}): void {
-    if (currentLevel <= LogLevel.ERROR) {
-      console.error(formatMessage("ERROR", message, meta));
-    }
-  },
-};
+const logger = winston.createLogger({
+  level: config.env === "production" ? "info" : "debug",
+  format: config.env === "production" ? prodFormat : devFormat,
+  defaultMeta: { service: "axon-api" },
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({
+      filename: "logs/error.log",
+      level: "error",
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
+    }),
+    new winston.transports.File({
+      filename: "logs/combined.log",
+      maxsize: 5242880,
+      maxFiles: 5,
+    }),
+  ],
+});
 
 export default logger;

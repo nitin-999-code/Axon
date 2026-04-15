@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: axon-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: axon_user
+      POSTGRES_PASSWORD: axon_pass
+      POSTGRES_DB: axon_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build: .
+    container_name: axon-api
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://axon_user:axon_pass@db:5432/axon_db
+      JWT_SECRET: change-this-in-production-64-chars-minimum-entropy
+      JWT_EXPIRES_IN: 7d
+      NODE_ENV: production
+      PORT: 8000
+      CORS_ORIGIN: "*"
+
+volumes:
+  pgdata:

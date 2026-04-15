@@ -1,9 +1,18 @@
 {
   "info": {
-    "name": "Axon API",
-    "description": "Smart Project Management Platform Collection",
+    "name": "Axon — Smart Project Management Platform",
+    "description": "Complete API collection for Axon backend",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api" },
+    { "key": "token", "value": "" },
+    { "key": "workspace_id", "value": "" },
+    { "key": "project_id", "value": "" },
+    { "key": "task_id", "value": "" },
+    { "key": "sprint_id", "value": "" },
+    { "key": "template_id", "value": "" }
+  ],
   "item": [
     {
       "name": "Auth",
@@ -13,12 +22,8 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/auth/register",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123\"\n}",
-              "options": { "raw": { "language": "json" } }
-            }
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"name\":\"Nitin Sahu\",\"email\":\"nitin@axon.dev\",\"password\":\"Secure@123\"}", "options": { "raw": { "language": "json" } } }
           }
         },
         {
@@ -26,12 +31,16 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/auth/login",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123\"\n}",
-              "options": { "raw": { "language": "json" } }
-            }
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"email\":\"nitin@axon.dev\",\"password\":\"Secure@123\"}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
           }
         }
       ]
@@ -44,12 +53,135 @@
           "request": {
             "method": "POST",
             "url": "{{base_url}}/workspaces",
-            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Axon Org\",\n  \"description\": \"Main project workspace\"\n}",
-              "options": { "raw": { "language": "json" } }
-            }
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"name\":\"Engineering\",\"description\":\"Main workspace\"}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Get Workspaces",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/workspaces",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Create Project",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/projects",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"name\":\"Axon Core\",\"description\":\"Core platform project\",\"workspaceId\":\"{{workspace_id}}\"}", "options": { "raw": { "language": "json" } } }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/tasks",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"title\":\"Setup CI/CD\",\"description\":\"Configure deployment pipeline\",\"projectId\":\"{{project_id}}\",\"priority\":\"HIGH\"}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Get Task",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/tasks/{{task_id}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Move Task",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/tasks/{{task_id}}/move",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"newProjectId\":\"{{project_id}}\"}", "options": { "raw": { "language": "json" } } }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dependencies",
+      "item": [
+        {
+          "name": "Add Dependency",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/dependencies",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"taskId\":\"{{task_id}}\",\"dependsOnId\":\"uuid\"}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Get Critical Path",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/dependencies/project/{{project_id}}/analyze",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Approvals",
+      "item": [
+        {
+          "name": "Request Approval",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/approvals/{{task_id}}/request-approval",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Approve Task",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/approvals/{{task_id}}/approve",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Reject Task",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/approvals/{{task_id}}/reject",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Templates",
+      "item": [
+        {
+          "name": "Create Template",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/templates",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"name\":\"Bug Fix\",\"description\":\"Standard bug fix template\",\"defaultPriority\":\"HIGH\",\"defaultPoints\":3,\"workspaceId\":\"{{workspace_id}}\"}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Create Task From Template",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/templates/{{template_id}}/create-task",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"projectId\":\"{{project_id}}\"}", "options": { "raw": { "language": "json" } } }
           }
         }
       ]
@@ -58,26 +190,66 @@
       "name": "Sprints",
       "item": [
         {
-          "name": "Get Burndown Chart",
+          "name": "Create Sprint",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/sprints",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"projectId\":\"{{project_id}}\",\"name\":\"Sprint 1\",\"goal\":\"MVP\",\"startDate\":\"2026-04-01\",\"endDate\":\"2026-04-14\"}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Get Velocity",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/sprints/{{sprint_id}}/velocity",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Get Burndown",
           "request": {
             "method": "GET",
             "url": "{{base_url}}/sprints/{{sprint_id}}/burndown",
-            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ]
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
           }
         }
       ]
-    }
-  ],
-  "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:3000/api",
-      "type": "string"
     },
     {
-      "key": "token",
-      "value": "your_jwt_token_here",
-      "type": "string"
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Add Comment",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/comments/{{task_id}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"content\":\"This looks great!\"}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Get Comments",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/comments/{{task_id}}?page=1&limit=10",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Activity Feed",
+      "item": [
+        {
+          "name": "Get Project Activity",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/activity/project/{{project_id}}?page=1&limit=20",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
     }
   ]
 }

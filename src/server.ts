@@ -1,14 +1,14 @@
-import createApp from "./app.js";
-import config from "./config/index.js";
-import db from "./config/database.js";
-import logger from "./utils/logger.js";
+import createApp from "./app";
+import config from "./config/index";
+import db from "./config/database";
+import logger from "./utils/logger";
 
 /**
  * Server entry point.
  * Connects to the database, starts the HTTP server,
  * and registers graceful shutdown handlers.
  */
-const startServer = async () => {
+const startServer = async (): Promise<void> => {
   try {
     // Connect to database
     await db.connect();
@@ -22,11 +22,12 @@ const startServer = async () => {
         port: config.port,
         env: config.env,
         url: `http://localhost:${config.port}`,
+        docs: `http://localhost:${config.port}/api/docs`,
       });
     });
 
     // ─── Graceful Shutdown ───────────────────────
-    const shutdown = async (signal) => {
+    const shutdown = async (signal: string): Promise<void> => {
       logger.info(`\n${signal} received — shutting down gracefully...`);
 
       server.close(async () => {
@@ -35,7 +36,6 @@ const startServer = async () => {
         process.exit(0);
       });
 
-      // Force shutdown after 10s if graceful fails
       setTimeout(() => {
         logger.error("⚠️  Forced shutdown — graceful shutdown timed out");
         process.exit(1);
@@ -46,15 +46,15 @@ const startServer = async () => {
     process.on("SIGINT", () => shutdown("SIGINT"));
 
     // ─── Unhandled Errors ────────────────────────
-    process.on("unhandledRejection", (reason) => {
+    process.on("unhandledRejection", (reason: any) => {
       logger.error("Unhandled Promise Rejection", { reason: reason?.message || reason });
     });
 
-    process.on("uncaughtException", (error) => {
+    process.on("uncaughtException", (error: Error) => {
       logger.error("Uncaught Exception", { error: error.message, stack: error.stack });
       process.exit(1);
     });
-  } catch (error) {
+  } catch (error: any) {
     logger.error("Failed to start server", { error: error.message });
     process.exit(1);
   }
