@@ -7,6 +7,8 @@ import taskRoutes from "./task.routes.js";
 import workflowRoutes from "./workflow.routes.js";
 import dependencyRoutes from "./dependency.routes.js";
 import sprintRoutes from "./sprint.routes.js";
+import commentRoutes from "./comment.routes.js";
+import activityRoutes from "./activity.routes.js";
 
 const router = Router();
 
@@ -19,5 +21,7 @@ router.use("/tasks", taskRoutes);
 router.use("/workflows", workflowRoutes);
 router.use("/dependencies", dependencyRoutes);
 router.use("/sprints", sprintRoutes);
+router.use("/comments", commentRoutes);
+router.use("/activity", activityRoutes);
 
 export default router;
