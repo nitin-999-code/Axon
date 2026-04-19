@@ -14,16 +14,16 @@ class NotificationService {
     EventBus.subscribe("TASK_ASSIGNED", this.handleTaskAssigned.bind(this));
   }
 
-  async handleTaskOverdue({ task, daysOverdue }) {
+  async handleTaskOverdue({ task, daysOverdue }: any) {
     // In a real system: send an email to task.assignee.email or push notification
     console.log(`[NotificationEngine: TASK_OVERDUE] Task ${task.id} ("${task.title}") is overdue by ${daysOverdue} days! Alerting assignee ${task.assigneeId}...`);
   }
 
-  async handleSprintCompleted({ sprint, velocity }) {
+  async handleSprintCompleted({ sprint, velocity }: any) {
     console.log(`[NotificationEngine: SPRINT_COMPLETED] Sprint ${sprint.id} ("${sprint.name}") has completed with a delivery velocity of ${velocity} Story Points. Formatting report...`);
   }
 
-  async handleTaskAssigned({ taskId, assigneeId }) {
+  async handleTaskAssigned({ taskId, assigneeId }: any) {
     console.log(`[NotificationEngine: TASK_ASSIGNED] User ${assigneeId} was assigned to Task ${taskId}. Sending in-app notification...`);
   }
 }

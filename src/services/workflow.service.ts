@@ -10,7 +10,7 @@ class WorkflowService {
   /**
    * Create a base workflow for a project.
    */
-  async createWorkflow(projectId, userId, ipAddress) {
+  async createWorkflow(projectId: any, userId: any, ipAddress: any) {
     const project = await projectRepository.findById(projectId);
     if (!project) throw ApiError.notFound("Project not found");
 
@@ -31,7 +31,7 @@ class WorkflowService {
   /**
    * Add a state to a workflow.
    */
-  async addState(workflowId, data, userId, ipAddress) {
+  async addState(workflowId: any, data: any, userId: any, ipAddress: any) {
     const workflow = await workflowRepository.findById(workflowId);
     if (!workflow) throw ApiError.notFound("Workflow not found");
 
@@ -55,7 +55,7 @@ class WorkflowService {
   /**
    * Add a transition between two states.
    */
-  async addTransition(workflowId, data, userId, ipAddress) {
+  async addTransition(workflowId: any, data: any, userId: any, ipAddress: any) {
     const { fromStateId, toStateId, allowedRoles } = data;
 
     const transition = await workflowRepository.createTransition({
@@ -80,7 +80,7 @@ class WorkflowService {
   /**
    * Transition a task to a new state with Role Validation.
    */
-  async transitionTask(taskId, targetStateName, userId, ipAddress) {
+  async transitionTask(taskId: any, targetStateName: any, userId: any, ipAddress: any) {
     const task = await taskRepository.findById(taskId);
     if (!task) throw ApiError.notFound("Task not found");
 
@@ -144,7 +144,7 @@ class WorkflowService {
     return updatedTask;
   }
 
-  async getWorkflowByProject(projectId) {
+  async getWorkflowByProject(projectId: any) {
     const workflow = await workflowRepository.findByProject(projectId);
     if (!workflow) throw ApiError.notFound("Workflow not found for this project");
     return workflow;

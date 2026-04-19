@@ -6,7 +6,7 @@ class ActivityRepository extends BaseRepository {
     super("auditLog");
   }
 
-  async getProjectActivity(projectId, taskIds, skip, take) {
+  async getProjectActivity(projectId: any, taskIds: any, skip: any, take: any) {
     return prisma.auditLog.findMany({
       where: {
         OR: [
@@ -30,7 +30,7 @@ class ActivityRepository extends BaseRepository {
     });
   }
 
-  async countProjectActivity(projectId, taskIds) {
+  async countProjectActivity(projectId: any, taskIds: any) {
     return prisma.auditLog.count({
       where: {
         OR: [

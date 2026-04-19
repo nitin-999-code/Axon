@@ -9,14 +9,14 @@ class DependencyRepository extends BaseRepository {
     super("taskDependency");
   }
 
-  async fetchProjectGraphQuery(projectId) {
+  async fetchProjectGraphQuery(projectId: any) {
     // We need all tasks in the project
     const tasks = await prisma.task.findMany({
       where: { projectId },
       select: { id: true, title: true, currentStatus: true },
     });
 
-    const taskIds = tasks.map(t => t.id);
+    const taskIds = tasks.map((t: any) => t.id);
 
     // Fetch all dependencies where both tasks are in this project
     const dependencies = await this.model.findMany({
@@ -31,7 +31,7 @@ class DependencyRepository extends BaseRepository {
     return { tasks, dependencies };
   }
 
-  async dependencyExists(taskId, dependsOnId) {
+  async dependencyExists(taskId: any, dependsOnId: any) {
     const existing = await this.model.findUnique({
       where: {
         taskId_dependsOnId: { taskId, dependsOnId }

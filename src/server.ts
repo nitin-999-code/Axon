@@ -51,11 +51,11 @@ const startServer = async (): Promise<void> => {
     });
 
     process.on("uncaughtException", (error: Error) => {
-      logger.error("Uncaught Exception", { error: error.message, stack: error.stack });
+      logger.error("Uncaught Exception", { error: (error as Error).message, stack: error.stack });
       process.exit(1);
     });
   } catch (error: any) {
-    logger.error("Failed to start server", { error: error.message });
+    logger.error("Failed to start server", { error: (error as Error).message });
     process.exit(1);
   }
 };

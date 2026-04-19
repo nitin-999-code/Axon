@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from "express";
 import workspaceService from "../services/workspace.service.js";
 
 /**
@@ -8,11 +9,11 @@ class WorkspaceController {
   /**
    * Create a new workspace.
    */
-  async createWorkspace(req, res, next) {
+  async createWorkspace(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, description } = req.body;
-      const ownerId = req.user.id;
-      const ipAddress = req.ip;
+      const { name, description } = req.body as any;
+      const ownerId = (req as any).user.id;
+      const ipAddress = (req.ip as string);
 
       const workspace = await workspaceService.createWorkspace(
         { name, description },
@@ -32,12 +33,12 @@ class WorkspaceController {
   /**
    * Add a member to a workspace.
    */
-  async addMember(req, res, next) {
+  async addMember(req: Request, res: Response, next: NextFunction) {
     try {
-      const { workspaceId } = req.params;
-      const { email, role } = req.body;
-      const adminId = req.user.id;
-      const ipAddress = req.ip;
+      const { workspaceId } = req.params as any;
+      const { email, role } = req.body as any;
+      const adminId = (req as any).user.id;
+      const ipAddress = (req.ip as string);
 
       const member = await workspaceService.addMember(
         workspaceId,
@@ -59,9 +60,9 @@ class WorkspaceController {
   /**
    * Get all workspaces for the authenticated user.
    */
-  async getUserWorkspaces(req, res, next) {
+  async getUserWorkspaces(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.user.id;
+      const userId = (req as any).user.id;
       const workspaces = await workspaceService.getUserWorkspaces(userId);
 
       res.status(200).json({
@@ -76,10 +77,10 @@ class WorkspaceController {
   /**
    * Get a specific workspace's details.
    */
-  async getWorkspaceDetails(req, res, next) {
+  async getWorkspaceDetails(req: Request, res: Response, next: NextFunction) {
     try {
-      const { workspaceId } = req.params;
-      const userId = req.user.id;
+      const { workspaceId } = req.params as any;
+      const userId = (req as any).user.id;
 
       const workspace = await workspaceService.getWorkspaceDetails(workspaceId, userId);
 

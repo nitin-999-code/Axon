@@ -8,7 +8,7 @@ class TaskRepository extends BaseRepository {
     super("task");
   }
 
-  async findByProject(projectId, options = {}) {
+  async findByProject(projectId: any, options: any = {}) {
     return this.findMany({
       where: { projectId },
       include: {
@@ -19,21 +19,21 @@ class TaskRepository extends BaseRepository {
     });
   }
 
-  async findByAssignee(assigneeId, options = {}) {
+  async findByAssignee(assigneeId: any, options: any = {}) {
     return this.findMany({
       where: { assigneeId },
       ...options,
     });
   }
 
-  async updateStatus(id, status) {
+  async updateStatus(id: any, status: any) {
     return this.model.update({
       where: { id },
       data: { currentStatus: status },
     });
   }
 
-  async findWithDependencies(id) {
+  async findWithDependencies(id: any) {
     return this.model.findUnique({
       where: { id },
       include: {

@@ -1,5 +1,6 @@
 import rateLimit from "express-rate-limit";
 import config from "../config/index";
+import { Request, Response, NextFunction } from "express";
 
 /**
  * Global rate limiter — prevents abuse and brute-force attacks.

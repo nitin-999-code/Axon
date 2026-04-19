@@ -10,7 +10,7 @@ class DependencyService {
   /**
    * Add a dependency between two tasks (Task A depends on Task B).
    */
-  async addDependency(taskId, dependsOnId, userId, ipAddress) {
+  async addDependency(taskId: string, dependsOnId: string, userId: string, ipAddress: string) {
     if (taskId === dependsOnId) {
       throw ApiError.badRequest("A task cannot depend on itself");
     }
@@ -65,7 +65,7 @@ class DependencyService {
   /**
    * Generate comprehensive dependency metrics for a project.
    */
-  async analyzeDependencyGraph(projectId) {
+  async analyzeDependencyGraph(projectId: string) {
     const project = await projectRepository.findById(projectId);
     if (!project) throw ApiError.notFound("Project not found");
 
@@ -78,8 +78,8 @@ class DependencyService {
     const { adj, inDegree } = GraphUtil.buildAdjacencyList(tasks, dependencies);
 
     // Provide a simple mapping matrix for front-end labeling
-    const taskMap = {};
-    tasks.forEach(t => taskMap[t.id] = t);
+    const taskMap: Record<string, any> = {};
+    tasks.forEach((t: any) => taskMap[t.id] = t);
 
     // Calculate topological flow 
     let sortedNodes = [];
@@ -97,12 +97,12 @@ class DependencyService {
     const bottlenecksRaw = GraphUtil.computeBottlenecks(adj);
 
     // Hydrate IDs with actual Task representations
-    const hydratedCriticalPath = criticalPathMetrics.path.map(id => taskMap[id]);
-    const hydratedBottlenecks = bottlenecksRaw.map(b => ({
+    const hydratedCriticalPath = criticalPathMetrics.path.map((id: any) => taskMap[id]);
+    const hydratedBottlenecks = bottlenecksRaw.map((b: any) => ({
       task: taskMap[b.taskId],
       blockingCount: b.dependentCount
     }));
-    const hydratedTopSort = sortedNodes.map(id => taskMap[id]);
+    const hydratedTopSort = sortedNodes.map((id: any) => taskMap[id]);
 
     return {
       topologicalOrder: hydratedTopSort,

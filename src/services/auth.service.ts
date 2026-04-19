@@ -15,7 +15,7 @@ class AuthService {
   /**
    * Register a new user.
    */
-  async register({ name, email, password }, ipAddress) {
+  async register({ name, email, password }: any, ipAddress: any) {
     // Check for existing user
     const exists = await userRepository.existsByEmail(email);
     if (exists) {
@@ -56,7 +56,7 @@ class AuthService {
   /**
    * Authenticate a user with email and password.
    */
-  async login({ email, password }, ipAddress) {
+  async login({ email, password }: any, ipAddress: any) {
     // Find user
     const user = await userRepository.findByEmail(email);
     if (!user) {
@@ -95,7 +95,7 @@ class AuthService {
   /**
    * Get the current user's profile.
    */
-  async getProfile(userId) {
+  async getProfile(userId: any) {
     const user = await userRepository.findById(userId, {
       select: {
         id: true,
@@ -122,10 +122,8 @@ class AuthService {
    * @param {string} userId
    * @returns {string}
    */
-  #generateToken(userId) {
-    return jwt.sign({ userId }, config.jwt.secret, {
-      expiresIn: config.jwt.expiresIn,
-    });
+  #generateToken(userId: any) {
+    return jwt.sign({ userId }, (config.jwt.secret as string), { expiresIn: config.jwt.expiresIn } as any);
   }
 }
 

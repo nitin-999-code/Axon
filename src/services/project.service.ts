@@ -8,7 +8,7 @@ class ProjectService {
   /**
    * Create a new project in a workspace.
    */
-  async createProject(data, userId, ipAddress) {
+  async createProject(data: { name: string; description?: string; workspaceId: string }, userId: string, ipAddress: string) {
     const { name, description, workspaceId } = data;
 
     // Verify workspace exists
@@ -39,7 +39,7 @@ class ProjectService {
   /**
    * Get a project by ID.
    */
-  async getProject(id) {
+  async getProject(id: string) {
     const project = await projectRepository.findWithWorkflow(id);
     if (!project) {
       throw ApiError.notFound("Project not found");
@@ -50,7 +50,7 @@ class ProjectService {
   /**
    * Update a project.
    */
-  async updateProject(id, data, userId, ipAddress) {
+  async updateProject(id: string, data: any, userId: string, ipAddress: string) {
     const project = await projectRepository.findById(id);
     if (!project) {
       throw ApiError.notFound("Project not found");
@@ -73,7 +73,7 @@ class ProjectService {
   /**
    * Delete a project.
    */
-  async deleteProject(id, userId, ipAddress) {
+  async deleteProject(id: string, userId: string, ipAddress: string) {
     const project = await projectRepository.findById(id);
     if (!project) {
       throw ApiError.notFound("Project not found");

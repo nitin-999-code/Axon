@@ -11,7 +11,7 @@ interface JwtPayload {
 /**
  * JWT authentication middleware.
  * Extracts token from Authorization header or cookies,
- * verifies it, and attaches user to req.user.
+ * verifies it, and attaches user to (req as any).user.
  */
 const authenticate = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -24,7 +24,7 @@ const authenticate = async (req: Request, _res: Response, next: NextFunction): P
       throw ApiError.unauthorized("Access token is required");
     }
 
-    const decoded = jwt.verify(token, config.jwt.secret) as JwtPayload;
+    const decoded = jwt.verify(token, (config.jwt.secret as string)) as JwtPayload;
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
@@ -43,7 +43,7 @@ const authenticate = async (req: Request, _res: Response, next: NextFunction): P
     (req as any).user = user;
     next();
   } catch (error: any) {
-    next(error instanceof ApiError ? error : ApiError.unauthorized(error.message));
+    next(error instanceof ApiError ? error : ApiError.unauthorized((error as Error).message));
   }
 };
 
@@ -54,7 +54,7 @@ const authenticate = async (req: Request, _res: Response, next: NextFunction): P
 const authorize = (...allowedRoles: string[]) => {
   return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { workspaceId } = req.params;
+      const { workspaceId } = req.params as any;
 
       if (!workspaceId) {
         throw ApiError.badRequest("Workspace ID is required for authorization");
@@ -82,7 +82,7 @@ const authorize = (...allowedRoles: string[]) => {
       (req as any).membership = membership;
       next();
     } catch (error: any) {
-      next(error instanceof ApiError ? error : ApiError.internal(error.message));
+      next(error instanceof ApiError ? error : ApiError.internal((error as Error).message));
     }
   };
 };

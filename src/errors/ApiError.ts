@@ -2,7 +2,7 @@ export class ApiError extends Error {
   public statusCode: number;
   public isOperational: boolean;
 
-  constructor(message: string, statusCode: number, isOperational = true) {
+  constructor(message: string, statusCode: number, isOperational: any = true) {
     super(message);
     this.name = this.constructor.name;
     this.statusCode = statusCode;

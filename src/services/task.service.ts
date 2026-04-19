@@ -9,7 +9,7 @@ class TaskService {
   /**
    * Create a new task (or subtask if parentTaskId is provided).
    */
-  async createTask(data, userId, ipAddress) {
+  async createTask(data: { title: string; description?: string; projectId: string; assigneeId?: string; parentTaskId?: string; priority?: string; dueDate?: Date | string }, userId: string, ipAddress: string) {
     const { title, description, projectId, assigneeId, parentTaskId, priority, dueDate } = data;
 
     // Validate project existence
@@ -61,7 +61,7 @@ class TaskService {
   /**
    * Get a task by ID including its dependencies, dependents, and subTasks.
    */
-  async getTask(id) {
+  async getTask(id: string) {
     const task = await taskRepository.findById(id, {
       include: {
         dependencies: true,
@@ -78,7 +78,7 @@ class TaskService {
   /**
    * Update task fields.
    */
-  async updateTask(id, data, userId, ipAddress) {
+  async updateTask(id: string, data: any, userId: string, ipAddress: string) {
     const task = await taskRepository.findById(id);
     if (!task) throw ApiError.notFound("Task not found");
 
@@ -99,7 +99,7 @@ class TaskService {
   /**
    * Delete a task.
    */
-  async deleteTask(id, userId, ipAddress) {
+  async deleteTask(id: string, userId: string, ipAddress: string) {
     const task = await taskRepository.findById(id);
     if (!task) throw ApiError.notFound("Task not found");
 
@@ -119,7 +119,7 @@ class TaskService {
   /**
    * Assign a user to a task.
    */
-  async assignUser(id, assigneeId, userId, ipAddress) {
+  async assignUser(id: string, assigneeId: string, userId: string, ipAddress: string) {
     const task = await taskRepository.findById(id);
     if (!task) throw ApiError.notFound("Task not found");
 
@@ -143,7 +143,7 @@ class TaskService {
   /**
    * Move task between projects.
    */
-  async moveTask(id, newProjectId, userId, ipAddress) {
+  async moveTask(id: string, newProjectId: string, userId: string, ipAddress: string) {
     const task = await taskRepository.findById(id);
     if (!task) throw ApiError.notFound("Task not found");
 

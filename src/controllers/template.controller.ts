@@ -11,7 +11,7 @@ class TemplateController {
       const template = await templateService.createTemplate(
         req.body,
         (req as any).user.id,
-        req.ip || ""
+        (req.ip as string) || ""
       );
       ApiResponse.created(res, "Template created successfully", template);
     } catch (error) {
@@ -21,7 +21,7 @@ class TemplateController {
 
   public async getTemplates(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { workspaceId } = req.params;
+      const { workspaceId } = req.params as any;
       const templates = await templateService.getTemplates(workspaceId);
       ApiResponse.ok(res, "Templates retrieved", templates);
     } catch (error) {
@@ -31,13 +31,13 @@ class TemplateController {
 
   public async createTaskFromTemplate(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { templateId } = req.params;
-      const { projectId } = req.body;
+      const { templateId } = req.params as any;
+      const { projectId } = req.body as any;
       const task = await templateService.createTaskFromTemplate(
         templateId,
         projectId,
         (req as any).user.id,
-        req.ip || ""
+        (req.ip as string) || ""
       );
       ApiResponse.created(res, "Task created from template", task);
     } catch (error) {

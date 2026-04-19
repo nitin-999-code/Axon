@@ -8,14 +8,14 @@ class ProjectRepository extends BaseRepository {
     super("project");
   }
 
-  async findByWorkspace(workspaceId, options = {}) {
+  async findByWorkspace(workspaceId: any, options: any = {}) {
     return this.findMany({
       where: { workspaceId },
       ...options,
     });
   }
 
-  async findWithWorkflow(id) {
+  async findWithWorkflow(id: any) {
     return this.model.findUnique({
       where: { id },
       include: {

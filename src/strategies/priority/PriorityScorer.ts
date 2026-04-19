@@ -1,30 +1,18 @@
-/**
- * Pluggable Priority Scoring wrapper utilizing the Strategy Pattern.
- * Context class that delegates the algorithm execution to the active Strategy.
- */
-class PriorityScorer {
-  constructor(strategy) {
+import { PriorityStrategy } from "./PriorityStrategy.js";
+
+export class PriorityScorer {
+  private strategy: PriorityStrategy;
+
+  constructor(strategy: PriorityStrategy) {
     this.strategy = strategy;
   }
 
-  /**
-   * Extensible method to swap scoring behavior at runtime.
-   */
-  setStrategy(strategy) {
+  setStrategy(strategy: PriorityStrategy): void {
     this.strategy = strategy;
   }
 
-  /**
-   * Calculates the priority score using the active injected strategy.
-   * 
-   * @param {Object} task The task to evaluate
-   * @returns {Number} The computed priority score
-   */
-  calculate(task) {
-    if (!this.strategy) {
-      throw new Error("PriorityScorer: No strategy defined.");
-    }
-    return this.strategy.calculate(task);
+  calculate(task: any): number {
+    return this.strategy.score(task);
   }
 }
 

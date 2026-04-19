@@ -1,15 +1,16 @@
+import { Request, Response, NextFunction } from "express";
 import commentService from "../services/comment.service.js";
 
 class CommentController {
-  async addComment(req, res, next) {
+  async addComment(req: Request, res: Response, next: NextFunction) {
     try {
-      const { content, parentCommentId } = req.body;
-      const { taskId } = req.params;
+      const { content, parentCommentId } = req.body as any;
+      const { taskId } = req.params as any;
       
       const comment = await commentService.addComment(
         { content, taskId, parentCommentId },
-        req.user.id,
-        req.ip
+        (req as any).user.id,
+        (req.ip as string)
       );
       
       res.status(201).json({ success: true, data: comment });
@@ -18,11 +19,11 @@ class CommentController {
     }
   }
 
-  async getComments(req, res, next) {
+  async getComments(req: Request, res: Response, next: NextFunction) {
     try {
-      const { taskId } = req.params;
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 10;
+      const { taskId } = req.params as any;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
       
       const result = await commentService.getCommentsByTask(taskId, page, limit);
       res.status(200).json({ success: true, ...result });

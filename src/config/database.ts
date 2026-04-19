@@ -33,7 +33,7 @@ class Database {
       await this.client.$connect();
       console.log("✅  Database connected successfully");
     } catch (error: any) {
-      console.error("❌  Database connection failed:", error.message);
+      console.error("❌  Database connection failed:", (error as Error).message);
       process.exit(1);
     }
   }

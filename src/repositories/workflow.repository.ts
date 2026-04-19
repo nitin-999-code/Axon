@@ -9,7 +9,7 @@ class WorkflowRepository extends BaseRepository {
     super("workflow");
   }
 
-  async findByProject(projectId) {
+  async findByProject(projectId: any) {
     return this.model.findUnique({
       where: { projectId },
       include: {
@@ -24,24 +24,24 @@ class WorkflowRepository extends BaseRepository {
     });
   }
 
-  async createState(data) {
-    return prisma.workflowState.create({ data });
+  async createState(data: any) {
+    return (prisma as any).workflowState.create({ data });
   }
 
-  async createTransition(data) {
-    return prisma.workflowTransition.create({ data });
+  async createTransition(data: any) {
+    return (prisma as any).workflowTransition.create({ data });
   }
 
-  async findStateByName(workflowId, name) {
-    return prisma.workflowState.findUnique({
+  async findStateByName(workflowId: any, name: any) {
+    return (prisma as any).workflowState.findUnique({
       where: {
         workflowId_name: { workflowId, name },
       },
     });
   }
 
-  async findTransition(workflowId, fromStateId, toStateId) {
-    return prisma.workflowTransition.findUnique({
+  async findTransition(workflowId: any, fromStateId: any, toStateId: any) {
+    return (prisma as any).workflowTransition.findUnique({
       where: {
         workflowId_fromStateId_toStateId: { workflowId, fromStateId, toStateId },
       },

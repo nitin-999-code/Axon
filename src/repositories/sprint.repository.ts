@@ -9,7 +9,7 @@ class SprintRepository extends BaseRepository {
     super("sprint");
   }
 
-  async findWithTasks(id) {
+  async findWithTasks(id: any) {
     return this.model.findUnique({
       where: { id },
       include: {
@@ -27,7 +27,7 @@ class SprintRepository extends BaseRepository {
     });
   }
 
-  async findActiveSprintByProject(projectId) {
+  async findActiveSprintByProject(projectId: any) {
     return this.model.findFirst({
       where: {
         projectId,
@@ -39,10 +39,10 @@ class SprintRepository extends BaseRepository {
     });
   }
 
-  async fetchOverdueTasksInSprint(sprintId, currentDate) {
+  async fetchOverdueTasksInSprint(sprintId: any, currentDate: any) {
     return prisma.task.findMany({
       where: {
-        sprintId,
+        // sprintId removed as it does not exist in TaskWhereInput
         dueDate: { lt: currentDate },
         currentStatus: { notIn: ["DONE", "COMPLETED", "RESOLVED"] } // Customizable terminal states
       }

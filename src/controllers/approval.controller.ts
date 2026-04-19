@@ -8,11 +8,11 @@ import ApiResponse from "../utils/ApiResponse";
 class ApprovalController {
   public async requestApproval(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { taskId } = req.params;
+      const { taskId } = req.params as any;
       const approval = await approvalService.requestApproval(
         taskId,
         (req as any).user.id,
-        req.ip || ""
+        (req.ip as string) || ""
       );
       ApiResponse.created(res, "Approval requested successfully", approval);
     } catch (error) {
@@ -22,11 +22,11 @@ class ApprovalController {
 
   public async approveTask(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { taskId } = req.params;
+      const { taskId } = req.params as any;
       const result = await approvalService.approveTask(
         taskId,
         (req as any).user.id,
-        req.ip || ""
+        (req.ip as string) || ""
       );
       ApiResponse.ok(res, "Task approved successfully", result);
     } catch (error) {
@@ -36,11 +36,11 @@ class ApprovalController {
 
   public async rejectTask(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { taskId } = req.params;
+      const { taskId } = req.params as any;
       const result = await approvalService.rejectTask(
         taskId,
         (req as any).user.id,
-        req.ip || ""
+        (req.ip as string) || ""
       );
       ApiResponse.ok(res, "Task rejected", result);
     } catch (error) {
@@ -50,7 +50,7 @@ class ApprovalController {
 
   public async getApprovals(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { taskId } = req.params;
+      const { taskId } = req.params as any;
       const approvals = await approvalService.getApprovalsByTask(taskId);
       ApiResponse.ok(res, "Approvals retrieved", approvals);
     } catch (error) {

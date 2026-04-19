@@ -14,7 +14,7 @@ class SprintService {
   /**
    * Create a sprint for a project.
    */
-  async createSprint(data, userId, ipAddress) {
+  async createSprint(data: any, userId: any, ipAddress: any) {
     const project = await projectRepository.findById(data.projectId);
     if (!project) throw ApiError.notFound("Project not found");
 
@@ -35,7 +35,7 @@ class SprintService {
   /**
    * Assign a logical task to a targeted Sprint.
    */
-  async assignTaskToSprint(taskId, sprintId, userId, ipAddress) {
+  async assignTaskToSprint(taskId: any, sprintId: any, userId: any, ipAddress: any) {
     const sprint = await sprintRepository.findById(sprintId);
     if (!sprint) throw ApiError.notFound("Sprint not found");
 
@@ -64,7 +64,7 @@ class SprintService {
    * Analytics: Compute velocity of a completed or active sprint.
    * Defined as sum of story points for all "DONE" tasks.
    */
-  async computeVelocity(sprintId) {
+  async computeVelocity(sprintId: any) {
     const sprint = await sprintRepository.findWithTasks(sprintId);
     if (!sprint) throw ApiError.notFound("Sprint not found");
 
@@ -73,7 +73,7 @@ class SprintService {
 
     const completedStates = ["DONE", "COMPLETED", "RESOLVED"];
 
-    sprint.tasks.forEach(task => {
+    sprint.tasks.forEach((task: any) => {
       totalPoints += task.storyPoints || 0;
       if (completedStates.includes(task.currentStatus.toUpperCase())) {
         completedPoints += task.storyPoints || 0;
@@ -92,12 +92,12 @@ class SprintService {
   /**
    * Analytics: Generate mathematical Burn-Down Chart dataset.
    */
-  async generateBurndownData(sprintId) {
+  async generateBurndownData(sprintId: any) {
     const sprint = await sprintRepository.findWithTasks(sprintId);
     if (!sprint) throw ApiError.notFound("Sprint not found");
 
     // Total story points at the beginning
-    const initialPoints = sprint.tasks.reduce((sum, task) => sum + (task.storyPoints || 0), 0);
+    const initialPoints = sprint.tasks.reduce((sum: any, task: any) => sum + (task.storyPoints || 0), 0);
 
     // In a real historical app, you would query task transition histories to build 
     // an accurate day-by-day burndown. For immediate analytical purposes, we approximate
@@ -105,11 +105,11 @@ class SprintService {
     const { completedPoints } = await this.computeVelocity(sprintId);
     const pointsRemaining = initialPoints - completedPoints;
 
-    const daysTotal = Math.ceil((new Date(sprint.endDate) - new Date(sprint.startDate)) / (1000 * 60 * 60 * 24));
+    const daysTotal = Math.ceil((new Date(sprint.endDate).getTime() - new Date(sprint.startDate).getTime()) / (1000 * 60 * 60 * 24));
     const idealBurnRate = initialPoints / (daysTotal || 1);
 
     return {
-      sprintId,
+      sprintId: sprintId as any,
       sprintName: sprint.name,
       metrics: {
         totalStoryPoints: initialPoints,
@@ -123,12 +123,12 @@ class SprintService {
   /**
    * Detect overdue tasks locally and fire specific EventBus events decoupled from DB layer.
    */
-  async detectOverdueTasks(sprintId) {
+  async detectOverdueTasks(sprintId: any) {
     const now = new Date();
     const overdueTasks = await sprintRepository.fetchOverdueTasksInSprint(sprintId, now);
 
-    overdueTasks.forEach(task => {
-      const msOverdue = now - new Date(task.dueDate);
+    overdueTasks.forEach((task: any) => {
+      const msOverdue = Number(now) - new Date(task.dueDate as string).getTime();
       const daysOverdue = Math.floor(msOverdue / (1000 * 60 * 60 * 24));
       
       // DECOUPLED ALERT - The Event Bus handles notification scaling internally without slowing HTTP throughput!
@@ -138,7 +138,7 @@ class SprintService {
     return {
       scanned: true,
       overdueCount: overdueTasks.length,
-      tasks: overdueTasks.map(t => ({ id: t.id, title: t.title, dueDate: t.dueDate }))
+      tasks: overdueTasks.map((t: any) => ({ id: t.id, title: t.title, dueDate: t.dueDate }))
     };
   }
 }

@@ -6,8 +6,8 @@ class CommentRepository extends BaseRepository {
     super("comment");
   }
 
-  async findByTaskWithPagination(taskId, skip, take) {
-    return prisma.comment.findMany({
+  async findByTaskWithPagination(taskId: any, skip: any, take: any) {
+    return (prisma as any).comment.findMany({
       where: { taskId },
       orderBy: { createdAt: "asc" },
       skip,
@@ -23,8 +23,8 @@ class CommentRepository extends BaseRepository {
     });
   }
 
-  async countByTask(taskId) {
-    return prisma.comment.count({
+  async countByTask(taskId: any) {
+    return (prisma as any).comment.count({
       where: { taskId }
     });
   }

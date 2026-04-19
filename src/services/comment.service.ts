@@ -5,7 +5,7 @@ import ApiError from "../utils/ApiError.js";
 import { ENTITY_TYPES, AUDIT_ACTIONS } from "../utils/constants.js";
 
 class CommentService {
-  async addComment({ content, taskId, parentCommentId }, userId, ipAddress) {
+  async addComment({ content, taskId, parentCommentId }: any, userId: any, ipAddress: any) {
     const task = await taskRepository.findById(taskId);
     if (!task) throw ApiError.notFound("Task not found");
 
@@ -36,7 +36,7 @@ class CommentService {
     return comment;
   }
 
-  async getCommentsByTask(taskId, page = 1, limit = 10) {
+  async getCommentsByTask(taskId: any, page: any = 1, limit: any = 10) {
     const skip = (page - 1) * limit;
     
     const [comments, totalCount] = await Promise.all([

@@ -24,22 +24,22 @@ class HealthService {
       await prisma.$queryRaw`SELECT 1`;
       const latency = Date.now() - start;
 
-      health.checks.database = {
+      (health.checks as any).database = {
         status: "connected",
         latencyMs: latency,
       };
     } catch (error) {
       health.status = "degraded";
-      health.checks.database = {
+      (health.checks as any).database = {
         status: "disconnected",
-        error: error.message,
+        error: (error as Error).message,
       };
-      logger.error("Health check — database unreachable", { error: error.message });
+      logger.error("Health check — database unreachable", { error: (error as Error).message });
     }
 
     // Memory usage
     const memUsage = process.memoryUsage();
-    health.checks.memory = {
+    (health.checks as any).memory = {
       rssBytes: memUsage.rss,
       heapUsedBytes: memUsage.heapUsed,
       heapTotalBytes: memUsage.heapTotal,

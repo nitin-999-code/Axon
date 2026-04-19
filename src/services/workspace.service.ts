@@ -12,7 +12,8 @@ class WorkspaceService {
   /**
    * Create a new workspace and assign the creator as OWNER.
    */
-  async createWorkspace({ name, description }, ownerId, ipAddress) {
+  async createWorkspace(data: { name: string; description?: string }, ownerId: string, ipAddress: string) {
+    const { name, description } = data;
     // We use Prisma directly for the nested creation to ensure atomic transaction
     // where the workspace and the owner membership are created together.
     const workspace = await prisma.workspace.create({
@@ -56,7 +57,8 @@ class WorkspaceService {
    * Add a new member to the workspace.
    * Typically invoked by OWNER or ADMIN.
    */
-  async addMember(workspaceId, adminId, { email, role }, ipAddress) {
+  async addMember(workspaceId: string, adminId: string, data: { email: string; role?: string }, ipAddress: string) {
+    const { email, role } = data;
     // 1. Check if workspace exists
     const workspace = await workspaceRepository.findById(workspaceId);
     if (!workspace) {
@@ -88,7 +90,7 @@ class WorkspaceService {
       data: {
         workspaceId,
         userId: userToAdd.id,
-        role: role || ROLES.MEMBER,
+        role: (role || ROLES.MEMBER) as any,
       },
       include: {
         user: {
@@ -113,7 +115,7 @@ class WorkspaceService {
   /**
    * Get all workspaces owned by or joined by the user.
    */
-  async getUserWorkspaces(userId) {
+  async getUserWorkspaces(userId: string) {
     return prisma.workspace.findMany({
       where: {
         members: {
@@ -130,7 +132,7 @@ class WorkspaceService {
   /**
    * Get workspace details including members.
    */
-  async getWorkspaceDetails(workspaceId, userId) {
+  async getWorkspaceDetails(workspaceId: string, userId: string) {
     // Quick authorization check: ensure the querying user is part of the workspace.
     const membership = await prisma.workspaceMember.findUnique({
       where: {

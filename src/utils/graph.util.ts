@@ -34,12 +34,12 @@ class GraphUtil {
     const adj: Record<string, string[]> = {};
     const inDegree: Record<string, number> = {};
 
-    tasks.forEach((t) => {
+    tasks.forEach((t: any) => {
       adj[t.id] = [];
       inDegree[t.id] = 0;
     });
 
-    dependencies.forEach((dep) => {
+    dependencies.forEach((dep: any) => {
       const u = dep.dependsOnId;
       const v = dep.taskId;
 
@@ -124,7 +124,7 @@ class GraphUtil {
     const dist: Record<string, number> = {};
     const parent: Record<string, string | null> = {};
 
-    sortedNodes.forEach((node) => {
+    sortedNodes.forEach((node: any) => {
       dist[node] = 1;
       parent[node] = null;
     });
@@ -164,13 +164,13 @@ class GraphUtil {
    */
   static computeBottlenecks(adj: Record<string, string[]>): BottleneckResult[] {
     const outDegree: Record<string, number> = {};
-    Object.keys(adj).forEach((node) => {
+    Object.keys(adj).forEach((node: any) => {
       outDegree[node] = adj[node].length;
     });
 
     const sortedByOutDegree = Object.entries(outDegree)
-      .sort((a, b) => b[1] - a[1])
-      .map(([node, degree]) => ({ taskId: node, dependentCount: degree }));
+      .sort((a: any, b: any) => b[1] - a[1])
+      .map(([node, degree]: any) => ({ taskId: node, dependentCount: degree }));
 
     return sortedByOutDegree.slice(0, 3);
   }

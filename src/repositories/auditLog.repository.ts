@@ -9,7 +9,7 @@ class AuditLogRepository extends BaseRepository {
     super("auditLog");
   }
 
-  async findByEntity(entityType, entityId, options = {}) {
+  async findByEntity(entityType: any, entityId: any, options: any = {}) {
     return this.findMany({
       where: { entityType, entityId },
       include: {
@@ -20,7 +20,7 @@ class AuditLogRepository extends BaseRepository {
     });
   }
 
-  async findByUser(userId, options = {}) {
+  async findByUser(userId: any, options: any = {}) {
     return this.findMany({
       where: { userId },
       orderBy: { timestamp: "desc" },
@@ -28,7 +28,7 @@ class AuditLogRepository extends BaseRepository {
     });
   }
 
-  async findByDateRange(start, end, options = {}) {
+  async findByDateRange(start: any, end: any, options: any = {}) {
     return this.findMany({
       where: {
         timestamp: {

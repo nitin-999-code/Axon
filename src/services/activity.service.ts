@@ -5,7 +5,7 @@ import ApiError from "../utils/ApiError.js";
 import { prisma } from "../config/database.js";
 
 class ActivityService {
-  async getProjectFeed(projectId, page = 1, limit = 20) {
+  async getProjectFeed(projectId: any, page: any = 1, limit: any = 20) {
     const project = await projectRepository.findById(projectId);
     if (!project) throw ApiError.notFound("Project not found");
 
@@ -15,7 +15,7 @@ class ActivityService {
       where: { projectId },
       select: { id: true }
     });
-    const taskIds = tasks.map(t => t.id);
+    const taskIds = tasks.map((t: any) => t.id);
 
     const skip = (page - 1) * limit;
 

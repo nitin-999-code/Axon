@@ -20,7 +20,7 @@ const validate = (schemas: ValidationSchemas) => {
       const result = schemas.body.safeParse(req.body);
       if (!result.success) {
         errors.push(
-          ...result.error.issues.map((issue) => ({
+          ...result.error.issues.map((issue: any) => ({
             field: `body.${issue.path.join(".")}`,
             message: issue.message,
           }))
@@ -34,7 +34,7 @@ const validate = (schemas: ValidationSchemas) => {
       const result = schemas.query.safeParse(req.query);
       if (!result.success) {
         errors.push(
-          ...result.error.issues.map((issue) => ({
+          ...result.error.issues.map((issue: any) => ({
             field: `query.${issue.path.join(".")}`,
             message: issue.message,
           }))
@@ -48,7 +48,7 @@ const validate = (schemas: ValidationSchemas) => {
       const result = schemas.params.safeParse(req.params);
       if (!result.success) {
         errors.push(
-          ...result.error.issues.map((issue) => ({
+          ...result.error.issues.map((issue: any) => ({
             field: `params.${issue.path.join(".")}`,
             message: issue.message,
           }))

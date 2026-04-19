@@ -8,14 +8,14 @@ class WorkspaceRepository extends BaseRepository {
     super("workspace");
   }
 
-  async findByOwner(ownerId) {
+  async findByOwner(ownerId: any) {
     return this.model.findMany({
       where: { ownerId },
       orderBy: { createdAt: "desc" },
     });
   }
 
-  async findWithMembers(id) {
+  async findWithMembers(id: any) {
     return this.model.findUnique({
       where: { id },
       include: {

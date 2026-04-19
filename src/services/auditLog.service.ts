@@ -16,7 +16,7 @@ class AuditLogService {
    * @param {Object} params.metadata - Additional context
    * @param {string} params.ipAddress - Client IP address
    */
-  async logAction({ userId, action, entityType, entityId, metadata = {}, ipAddress = null }) {
+  async logAction({ userId, action, entityType, entityId, metadata = {}, ipAddress = null }: any) {
     try {
       const log = await auditLogRepository.create({
         userId,
@@ -35,20 +35,20 @@ class AuditLogService {
         action,
         entityType,
         entityId,
-        error: error.message,
+        error: (error as Error).message,
       });
     }
   }
 
-  async getLogsByEntity(entityType, entityId, options = {}) {
+  async getLogsByEntity(entityType: any, entityId: any, options: any = {}) {
     return auditLogRepository.findByEntity(entityType, entityId, options);
   }
 
-  async getLogsByUser(userId, options = {}) {
+  async getLogsByUser(userId: any, options: any = {}) {
     return auditLogRepository.findByUser(userId, options);
   }
 
-  async getLogsByDateRange(start, end, options = {}) {
+  async getLogsByDateRange(start: any, end: any, options: any = {}) {
     return auditLogRepository.findByDateRange(start, end, options);
   }
 }

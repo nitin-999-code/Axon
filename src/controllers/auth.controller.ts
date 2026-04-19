@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from "express";
 import authService from "../services/auth.service.js";
 import asyncHandler from "../middleware/asyncHandler.js";
 import ApiResponse from "../utils/ApiResponse.js";
@@ -9,8 +10,8 @@ class AuthController {
   /**
    * POST /api/auth/register
    */
-  register = asyncHandler(async (req, res) => {
-    const ipAddress = req.ip;
+  register = asyncHandler(async (req: Request, res: Response) => {
+    const ipAddress = (req.ip as string);
     const result = await authService.register(req.body, ipAddress);
 
     // Set token in httpOnly cookie
@@ -27,8 +28,8 @@ class AuthController {
   /**
    * POST /api/auth/login
    */
-  login = asyncHandler(async (req, res) => {
-    const ipAddress = req.ip;
+  login = asyncHandler(async (req: Request, res: Response) => {
+    const ipAddress = (req.ip as string);
     const result = await authService.login(req.body, ipAddress);
 
     res.cookie("accessToken", result.token, {
@@ -44,7 +45,7 @@ class AuthController {
   /**
    * POST /api/auth/logout
    */
-  logout = asyncHandler(async (_req, res) => {
+  logout = asyncHandler(async (_req: any, res: any) => {
     res.clearCookie("accessToken");
     return ApiResponse.ok(res, "Logged out successfully");
   });
@@ -52,8 +53,8 @@ class AuthController {
   /**
    * GET /api/auth/me
    */
-  getProfile = asyncHandler(async (req, res) => {
-    const user = await authService.getProfile(req.user.id);
+  getProfile = asyncHandler(async (req: Request, res: Response) => {
+    const user = await authService.getProfile((req as any).user.id);
     return ApiResponse.ok(res, "Profile retrieved", user);
   });
 }
