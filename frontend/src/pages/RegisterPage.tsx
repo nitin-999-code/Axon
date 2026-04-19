@@ -9,17 +9,43 @@ export const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
+
+    // Client-side validation matching backend rules
+    if (name.trim().length < 2) {
+      setError("Name must be at least 2 characters");
+      setLoading(false);
+      return;
+    }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      setLoading(false);
+      return;
+    }
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      setError("Password must contain at least one uppercase letter, one lowercase letter, and one digit");
+      setLoading(false);
+      return;
+    }
+
     try {
-      await register({ name, email, password });
+      await register({ name: name.trim(), email: email.trim().toLowerCase(), password });
       setSuccess(true);
       setTimeout(() => navigate("/login"), 1500);
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Registration failed");
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.errors?.[0]?.message ||
+        "Registration failed. Please try again.";
+      setError(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,8 +64,8 @@ export const RegisterPage = () => {
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && <div className="text-red-500 text-sm text-center bg-red-50 p-2 rounded">{error}</div>}
-          {success && <div className="text-green-600 text-sm text-center bg-green-50 p-2 rounded">Account created! Redirecting to login...</div>}
+          {error && <div className="text-red-500 text-sm text-center bg-red-50 p-3 rounded">{error}</div>}
+          {success && <div className="text-green-600 text-sm text-center bg-green-50 p-3 rounded">Account created! Redirecting to login...</div>}
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <input
@@ -65,21 +91,21 @@ export const RegisterPage = () => {
               <input
                 type="password"
                 required
-                minLength={6}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password (min 6 characters)"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </div>
+          <p className="text-xs text-gray-400">Min 8 chars, at least 1 uppercase, 1 lowercase, and 1 digit.</p>
           <div>
             <button
               type="submit"
-              disabled={success}
+              disabled={success || loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
-              Sign up
+              {loading ? "Creating account..." : "Sign up"}
             </button>
           </div>
           <div className="text-center text-sm text-gray-600">

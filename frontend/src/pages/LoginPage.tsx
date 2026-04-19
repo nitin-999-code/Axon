@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { LayoutDashboard } from "lucide-react";
 
@@ -15,8 +15,9 @@ export const LoginPage = () => {
     try {
       await loginUser({ email, password });
       navigate("/dashboard");
-    } catch (err) {
-      setError("Invalid credentials");
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || "Login failed";
+      setError(msg);
     }
   };
 
@@ -62,12 +63,6 @@ export const LoginPage = () => {
             >
               Sign in
             </button>
-          </div>
-          <div className="text-center text-sm text-gray-600">
-            Don't have an account?{" "}
-            <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Sign up
-            </Link>
           </div>
         </form>
       </div>

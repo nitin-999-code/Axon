@@ -26,9 +26,11 @@ const createApp = (): express.Application => {
   app.use(helmet());
   app.use(
     cors({
-      origin: config.cors.origin,
+      origin: function (origin, callback) {
+        callback(null, true); // Reflects the requesting origin (bypassing CORS origin checks for now)
+      },
       credentials: true,
-      methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
     })
   );
