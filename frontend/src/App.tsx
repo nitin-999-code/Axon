@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 import { Navbar } from "./components/Navbar";
 import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ProjectsPage } from "./pages/ProjectsPage";
 import { TaskBoardPage } from "./pages/TaskBoardPage";
@@ -26,6 +27,7 @@ function App() {
       <main className="h-[calc(100vh-4rem)] relative">
         <Routes>
           <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
+          <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <RegisterPage />} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
           <Route path="/projects/:projectId" element={<ProtectedRoute><TaskBoardPage /></ProtectedRoute>} />
