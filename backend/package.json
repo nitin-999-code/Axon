@@ -2,12 +2,12 @@
   "name": "axon-backend",
   "version": "1.0.0",
   "description": "Axon — Smart Project Management Platform Backend",
-  "type": "module",
+
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
-    "start": "NODE_ENV=production node dist/server.js",
+    "start": "node dist/server.js",
     "db:generate": "npx prisma generate",
     "db:push": "npx prisma db push",
     "db:migrate": "npx prisma migrate dev",
