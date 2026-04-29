@@ -14,9 +14,6 @@ Unlike traditional task management tools, Axon introduces a configurable workflo
 
 **Full Stack Application**
 
-Backend Weightage: **75%**
-Frontend Weightage: **25%**
-
 The backend is the primary focus of this system, emphasizing:
 
 * System Design
